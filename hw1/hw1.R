@@ -39,6 +39,7 @@ rep(1:3, times = 3)
 rep(1:3, each = 3)
 
 ## MB.Ch1.2
+#library(lattice) #RStudio can also do this step
 library(DAAG)
 orings <- DAAG::orings
 dataframe1 <- orings[c(1, 2, 4, 11, 13), ]
@@ -46,3 +47,43 @@ plot(dataframe1[, 1], dataframe1[, 4],
      xlab = "Temperature", ylab = "Total incidents")
 plot(orings[, 1], orings[, 4],
      xlab = "Temperature", ylab = "Total incidents")
+
+## MB.Ch1.4
+#library(lattice) #RStudio can also do this step
+library(DAAG)
+ais <- DAAG::ais
+str(ais)
+# determine whether any of the columns hold missing values
+sum(is.na(ais))
+# make a table 
+table(ais$sex, ais$sport)
+
+## MB.Ch1.6
+#                elevation  area
+# Winnipeg             217 24387
+# Winnipegosis         254  5374
+# Manitoba             248  4624
+# SouthernIndian       254  2247
+# Cedar                253  1353
+# Island               227  1223
+# Gods                 178  1151
+# Cross                207   755
+# Playgreen            217   657
+elevation <- c(217, 254, 248, 254, 253, 227, 178, 207, 217)
+area <- c(24387, 5374, 4624, 2247, 1353, 1223, 1151, 755, 657)
+names <- c("Winnipeg", "Winnipegosis", "Manitoba", "SouthernIndian",
+           "Cedar", "Island", "Gods", "Cross", "Playgreen")
+dataframe <- data.frame("elevation" = elevation, "area" = area,
+                        row.names = names)
+# a
+attach(Manitoba.lakes)
+plot(log2(area) ~ elevation, pch=16, xlim=c(170,280))
+# NB: Doubling the area increases log2(area) by 1.0
+text(log2(area) ~ elevation, labels=row.names(Manitoba.lakes), pos=4)
+text(log2(area) ~ elevation, labels=area, pos=2) 
+title("Manitoba’s Largest Lakes")
+# b
+plot(area ~ elevation, pch=16, xlim=c(170,280), log = "y")#ylog=T)
+text(area ~ elevation, labels=row.names(Manitoba.lakes), pos=4, ylog=T)
+text(area ~ elevation, labels=area, pos=2, ylog=T) 
+title("Manitoba’s Largest Lakes")

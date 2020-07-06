@@ -151,9 +151,102 @@ Create a new data frame by extracting these rows from orings, and plot total inc
 library(DAAG)
 orings <- DAAG::orings
 dataframe1 <- orings[c(1, 2, 4, 11, 13), ]
+# for this new data frame
 plot(dataframe1[, 1], dataframe1[, 4],
      xlab = "Temperature", ylab = "Total incidents")
+# for the full data set
 plot(orings[, 1], orings[, 4],
      xlab = "Temperature", ylab = "Total incidents")
 ```
 
+
+
+# MB.Ch1.4
+
+For the data frame ais (DAAG package)
+
+(a) Use the function str() to get information on each of the columns. Determine whether any of the columns hold missing values.
+
+**Ans:** The function `is.na()` can tell that if a variable is NA. And `is.na(ais)` can tell that if an element is missing. Then we can use `sum(is.na(ais))` to count the missing values in the `ais`. In this problem, `sum(is.na(ais)) = 0`, which means that there is no missing value in any columns. If we want to check if a column holds missing values, we can use `sum(is.na(ais$column))`.
+
+```{r}
+ais <- DAAG::ais
+str(ais)
+# determine whether any of the columns hold missing values
+sum(is.na(ais))
+```
+
+(b) Make a table that shows the numbers of males and females for each different sport. In which sports is there a large imbalance (e.g., by a factor of more than 2:1) in the numbers of the two sexes?
+
+```{r}
+# make a table 
+table(ais$sex, ais$sport)
+```
+
+
+
+# MB.Ch1.6
+
+Create a data frame called Manitoba.lakes that contains the lake’s elevation (in meters above sea level) and area (in square kilometers) as listed below. Assign the names of the lakes using the row.names() function.
+               elevation  area
+Winnipeg             217 24387
+Winnipegosis         254  5374
+Manitoba             248  4624
+SouthernIndian       254  2247
+Cedar                253  1353
+Island               227  1223
+Gods                 178  1151
+Cross                207   755
+Playgreen            217   657
+
+```{r}
+elevation <- c(217, 254, 248, 254, 253, 227, 178, 207, 217)
+area <- c(24387, 5374, 4624, 2247, 1353, 1223, 1151, 755, 657)
+names <- c("Winnipeg", "Winnipegosis", "Manitoba", "SouthernIndian",
+           "Cedar", "Island", "Gods", "Cross", "Playgreen")
+dataframe <- data.frame("elevation" = elevation, "area" = area,
+                        row.names = names)
+```
+
+(a) Use the following code to plot log2(area) versus elevation, adding labeling information (there is an extreme value of area that makes a logarithmic scale pretty much essential):
+
+```{r}
+attach(Manitoba.lakes)
+plot(log2(area) ~ elevation, pch=16, xlim=c(170,280))
+# NB: Doubling the area increases log2(area) by 1.0
+text(log2(area) ~ elevation, labels=row.names(Manitoba.lakes), pos=4)
+text(log2(area) ~ elevation, labels=area, pos=2) 
+title("Manitoba’s Largest Lakes")
+```
+
+Devise captions that explain the labeling on the points and on the y-axis. It will be necessary to explain how distances on the scale relate to changes in area.
+
+(b) Repeat the plot and associated labeling, now plotting area versus elevation, but specifying log="y" in order to obtain a logarithmic y-scale.
+
+```{r}
+plot(area ~ elevation, pch=16, xlim=c(170,280), ylog=T)
+text(area ~ elevation, labels=row.names(Manitoba.lakes), pos=4, ylog=T)
+text(area ~ elevation, labels=area, pos=2, ylog=T) 
+title("Manitoba’s Largest Lakes")
+```
+
+
+
+# MB.Ch1.7
+
+Look up the help page for the R function `dotchart()`. Use this function to display the areas of the Manitoba lakes (a) on a linear scale, and (b) on a logarithmic scale. Add, in each case, suitable labeling information.
+
+```{r}
+# (a)
+dotchart(log2(area))
+```
+
+
+
+# MB.Ch1.8
+
+Using the sum() function, obtain a lower bound for the area of Manitoba covered by water.
+
+```{r}
+
+```
