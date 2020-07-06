@@ -29,3 +29,20 @@ dataframe3[1,2] + dataframe3[1,3]
 list4 <- list(z1="6", z2=42, z3="49", z4=126)
 list4[[2]]+list4[[4]]
 list4[2]+list4[4]
+
+## 3
+# a
+seq(1, 1000, by = 372)
+seq(1, 1000, length.out = 50)
+# b
+rep(1:3, times = 3)
+rep(1:3, each = 3)
+
+## MB.Ch1.2
+library(DAAG)
+orings <- DAAG::orings
+dataframe1 <- orings[c(1, 2, 4, 11, 13), ]
+plot(dataframe1[, 1], dataframe1[, 4],
+     xlab = "Temperature", ylab = "Total incidents")
+plot(orings[, 1], orings[, 4],
+     xlab = "Temperature", ylab = "Total incidents")
