@@ -1,0 +1,54 @@
+---
+title: "Homework 1 - Report"
+author: "3170105743 李政达"
+date: "2020/7/6"
+output: 
+  pdf_document: 
+    latex_engine: xelatex
+
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Question 1
+
+The Iowa data set iowa.csv is a toy example that summarises the yield of wheat (bushels per acre) for the state of Iowa between 1930-1962. In addition to yield, year, rainfall and temperature were recorded as the main predictors of yield.
+
+a. First, we need to load the data set into R using the command read.csv() . Use the help function to learn what arguments this function takes. Once you have the necessary input, load the data set into R and make it a data frame called iowa.df.
+
+**Ans:** We can use help("read.csv") to learn the parameters of the function. The first parameter is the file name, and it may change in different case. I save the file in the data folder, which is in the parent directory of this .rmd file, so I set the first parameter to `"../data/iowa.csv"`. `header = TRUE` means that the first row contains the names of the variables. `sep = ";"` means that the field separator is semicolon.
+
+```{r}
+iowa.df <- read.csv("../data/iowa.csv", header=TRUE, sep = ";")
+iowa.df
+```
+
+b. How many rows and columns does iowa.df have?
+
+```{r}
+length(row.names(iowa.df))
+length(names(iowa.df))
+```
+
+c. What are the names of the columns of iowa.df?
+
+```{r}
+names(iowa.df)
+```
+
+d. What is the value of row 5, column 7 of iowa.df?
+
+```{r}
+iowa.df[5, 7]
+```
+
+e. Display the second row of iowa.df in its entirety.
+
+```{r}
+iowa.df[2, ]
+```
+
+
+
