@@ -52,3 +52,48 @@ iowa.df[2, ]
 
 
 
+# Question 2
+
+Syntax and class-typing.
+
+a. For each of the following commands, either explain why they should be errors, or explain the non-erroneous result.
+
+```
+vector1 <- c("5", "12", "7", "32")
+max(vector1)
+sort(vector1)
+sum(vector1)
+```
+
+**Ans:**
+
+- `c()` can combine values into a vector or list, so `vector1` will be a vector containing `"5"  "12" "7"  "32"`.
+- `max()` return the maximum of the input values. The type of input is character, which can be compare. So the command runs correctly and returns the maximum, which is `"7"`.
+- `sort()` can sort a vector into ascending order. The type of input is `character`, which can be compare. So the command runs correctly and sorts the vector, and outputs `"12" "32" "5"  "7" `.
+- `sum()` can compute the sums of all the input values, but the character type can not be added, so the command will cause an error.
+
+```{r}
+vector1 <- c("5", "12", "7", "32")
+max(vector1)
+sort(vector1)
+#sum(vector1) #error
+```
+
+b. For the next series of commands, either explain their results, or why they should produce errors.
+
+```
+vector2 <- c("5",7,12)
+vector2[2] + vector2[3]
+
+dataframe3 <- data.frame(z1="5",z2=7,z3=12)
+dataframe3[1,2] + dataframe3[1,3]
+
+list4 <- list(z1="6", z2=42, z3="49", z4=126)
+list4[[2]]+list4[[4]]
+list4[2]+list4[4]
+```
+
+**Ans:** 
+
+- `c()` will combine all kinds of values, but the type of the values may change in order to compatibility. For example, boolean variable will change its type when combined with integer variable, and integer variable will change its type when combined with double variable. In this command, the type of the elements in `vector2` will be character.
+- Because the values of `vector2` is character, they can not be added. So the command will cause an error.
