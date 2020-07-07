@@ -70,4 +70,55 @@ sum(colSums(apply(ca_pa,c(1,2),is.na)))
 
 a. The variable `Built_2005_or_later` indicates the percentage of houses in each Census tract built since 2005.  Plot median house prices against this variable.
 
+```{r}
+plot(ca_pa$Median_house_value, ca_pa$Built_2005_or_later,
+     xlab = "median house prices",
+     ylab = "percentage of houses built since 2005")
+```
+
 b. Make a new plot, or pair of plots, which breaks this out by state.  Note that the state is recorded in the `STATEFP` variable, with California being state 6 and Pennsylvania state 42.
+
+```{r}
+#分别画两个州
+```
+
+3. _Nobody Home_
+
+The vacancy rate is the fraction of housing units which are not occupied.  The dataframe contains columns giving the total number of housing units for each Census tract, and the number of vacant housing units.  
+
+a. Add a new column to the dataframe which contains the vacancy rate.  What are the minimum, maximum, mean, and median vacancy rates?
+
+```{r}
+Vacancy_rate <- ca_pa$Vacant_units / ca_pa$Total_units
+ca_pa <- data.frame(ca_pa, Vacancy_rate)
+max(Vacancy_rate)
+min(Vacancy_rate)
+mean(Vacancy_rate)
+median(Vacancy_rate)
+```
+
+b. Plot the vacancy rate against median house value.
+
+```{r}
+plot(ca_pa$Median_house_value, ca_pa$Vacancy_rate,
+     xlab = "median house prices",
+     ylab = "vacancy rate")
+```
+
+c. Plot vacancy rate against median house value separately for California and for Pennsylvania.  Is there a difference?
+
+```{r}
+#分别画两个州
+```
+
+4. The column `COUNTYFP` contains a numerical code for counties within each state.  We are interested in Alameda County (county 1 in California), Santa Clara (county 85 in California), and Allegheny County (county 3 in Pennsylvania).
+
+a. Explain what the block of code at the end of this question is supposed to accomplish, and how it does it.
+
+b. Give a single line of R which gives the same final answer as the block of code.  Note: there are at least two ways to do this; you just have to find one.
+
+c. For Alameda, Santa Clara and Allegheny Counties, what were the average percentages of housing built since 2005?
+
+d. The `cor` function calculates the correlation coefficient between two variables.  What is the correlation between median house value and the percent of housing built since 2005 in (i) the whole data, (ii) all of California, (iii) all of Pennsylvania, (iv) Alameda County, (v) Santa Clara County and (vi) Allegheny County?
+
+e. Make three plots, showing median house values against median income, for Alameda, Santa Clara, and Allegheny Counties.  (If you can fit the information into one plot, clearly distinguishing the three counties, that's OK too.)
