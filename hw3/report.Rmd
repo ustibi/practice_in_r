@@ -1,0 +1,37 @@
+---
+title: "Homework 3 - Report"
+CJKmainfont: SimSun
+author: "3170105743 李政达"
+date: "2020/7/8"
+output:
+  pdf_document:
+    includes:
+      header-includes:
+        - \usepackage{xeCJK}
+    keep_tex: no
+    latex_engine: xelatex
+
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+You will estimate the power-law scaling model, and its uncertainty, using the data alluded to in lecture, available in the file `gmp.dat` from lecture, which contains data for 2006.
+
+```{r}
+gmp <- read.table("../data/gmp.dat")
+gmp$pop <- round(gmp$gmp / gmp$pcgmp)
+```
+
+1. First, plot the data as in lecture, with per capita GMP on the y-axis and population on the x-axis. Add the curve function with the default values provided in lecture. Add two more curves corresponding to $a=0.1$ and $a=0.15$; use the `col` option to give each curve a different color (of your choice).
+
+```{r}
+plot(gmp$pcgmp ~ gmp$pop, log = "x",
+     xlab = "population", ylab = "per capita GMP",
+     main = "US Metropolitan Areas, 2006")
+curve(6611*x^(1/8), add = TRUE, col = "blue")
+curve(6611*x^(0.1), add = TRUE, col = "red")
+curve(6611*x^(0.15), add = TRUE, col = "green")
+```
+
