@@ -35,3 +35,34 @@ curve(6611*x^(0.1), add = TRUE, col = "red")
 curve(6611*x^(0.15), add = TRUE, col = "green")
 ```
 
+2. Write a function, called `mse()`, which calculates the mean squared error of the model on a given data set. `mse()` should take three arguments: a numeric vector of length two, the first component standing for $y_0$ and the second for $a$; a numerical vector containing the values of $N$; and a numerical vector containing the values of $Y$.  The function should return a single numerical value. The latter two arguments should have as the default values the columns `pop` and `pcgmp` (respectively) from the `gmp` data frame from lecture.  Your function may not use `for()` or any other loop. Check that, with the default data, you get the following values.
+
+```
+> mse(c(6611,0.15))
+[1] 207057513
+> mse(c(5000,0.10))
+[1] 298459915
+```
+
+```{r}
+mse <- function(x, N = gmp$pop, Y = gmp$pcgmp) {
+  return(sum((Y - x[1]*N^x[2]) ^ 2) / length(N))
+}
+mse(c(6611, 0.15))
+mse(c(5000, 0.10))
+```
+
+4. R has several built-in functions for optimization, which we will meet as we go through the course.  One of the simplest is `nlm()`, or non-linear minimization. `nlm()` takes two required arguments: a function, and a starting value for that function. Run `nlm()` three times with your function `mse()` and three starting value pairs for $y_0$ and $a$ as in
+
+```
+nlm(mse, c(y0=6611,a=1/8))
+```
+
+What do the quantities `minimum` and `estimate` represent? What values does it return for these?
+
+```{r}
+nlm(mse, c(y0=6611,a=1/8))
+nlm(mse, c(y0=6611,a=0.1))
+nlm(mse, c(y0=6611,a=0.15))
+```
+
