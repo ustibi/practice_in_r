@@ -1,3 +1,4 @@
+rm(list = ls())
 ## 1
 # a
 iowa.df <- read.csv("data/iowa.csv", header=TRUE, sep = ";")
@@ -21,14 +22,14 @@ sort(vector1)
 
 # b
 vector2 <- c("5",7,12)
-vector2[2] + vector2[3]
+#vector2[2] + vector2[3] #error
 
 dataframe3 <- data.frame(z1="5",z2=7,z3=12)
 dataframe3[1,2] + dataframe3[1,3]
 
 list4 <- list(z1="6", z2=42, z3="49", z4=126)
 list4[[2]]+list4[[4]]
-list4[2]+list4[4]
+#list4[2]+list4[4] #error
 
 ## 3
 # a
@@ -73,8 +74,8 @@ elevation <- c(217, 254, 248, 254, 253, 227, 178, 207, 217)
 area <- c(24387, 5374, 4624, 2247, 1353, 1223, 1151, 755, 657)
 names <- c("Winnipeg", "Winnipegosis", "Manitoba", "SouthernIndian",
            "Cedar", "Island", "Gods", "Cross", "Playgreen")
-dataframe <- data.frame("elevation" = elevation, "area" = area,
-                        row.names = names)
+Manitoba.lakes <- data.frame("elevation" = elevation, "area" = area)
+row.names(Manitoba.lakes) <- names
 # a
 attach(Manitoba.lakes)
 plot(log2(area) ~ elevation, pch=16, xlim=c(170,280))
@@ -83,7 +84,20 @@ text(log2(area) ~ elevation, labels=row.names(Manitoba.lakes), pos=4)
 text(log2(area) ~ elevation, labels=area, pos=2) 
 title("Manitoba’s Largest Lakes")
 # b
-plot(area ~ elevation, pch=16, xlim=c(170,280), log = "y")#ylog=T)
+plot(area ~ elevation, pch=16, xlim=c(170,280), ylog=T)
 text(area ~ elevation, labels=row.names(Manitoba.lakes), pos=4, ylog=T)
 text(area ~ elevation, labels=area, pos=2, ylog=T) 
 title("Manitoba’s Largest Lakes")
+
+## MB.Ch1.7
+# (a)
+dotchart(area, xlab = "area", ylab = "lakes", labels = names)
+title("(a)the areas of the Manitoba lakes on a linear scale")
+# (b)
+dotchart(log2(area), xlab = "log2(area)", ylab = "lakes", labels = names)
+title("(b)the areas of the Manitoba lakes on a logarithmic scale")
+
+## MB.Ch1.8
+sum(area)
+detach(Manitoba.lakes)
+rm(list = ls())
