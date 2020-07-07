@@ -57,7 +57,10 @@ str(ais)
 # determine whether any of the columns hold missing values
 sum(is.na(ais))
 # make a table 
-table(ais$sex, ais$sport)
+t <- table(ais$sex, ais$sport)
+t
+ratio = t[1, ] / t[2, ]
+names(ratio[(ratio > 2) | (ratio < 1/2)])
 
 ## MB.Ch1.6
 #                elevation  area

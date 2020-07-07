@@ -184,9 +184,14 @@ sum(is.na(ais))
 
 (b) Make a table that shows the numbers of males and females for each different sport. In which sports is there a large imbalance (e.g., by a factor of more than 2:1) in the numbers of the two sexes?
 
+**Ans:** We can store the ratios of female to male of all sports. Then we need to pick up the sports whose ratio of female to male is larger than 2 or less than 1/2.
+
 ```{r}
 # make a table 
-table(ais$sex, ais$sport)
+t <- table(ais$sex, ais$sport)
+t
+ratio = t[1, ] / t[2, ]
+names(ratio[(ratio > 2) | (ratio < 1/2)])
 ```
 
 
