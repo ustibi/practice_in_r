@@ -1,0 +1,73 @@
+---
+title: "Homework 2 - Report"
+CJKmainfont: SimSun
+author: "3170105743 李政达"
+date: "2020/7/7"
+output:
+  pdf_document:
+    includes:
+      header-includes:
+        - \usepackage{xeCJK}
+    keep_tex: no
+    latex_engine: xelatex
+
+
+
+
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+The data set calif_penn_2011.csv contains information about the housing stock of California and Pennsylvania, as of 2011.  Information as aggregated into "Census tracts", geographic regions of a few thousand people which are supposed to be fairly homogeneous economically and socially.
+
+1. _Loading and cleaning_
+
+a. Load the data into a dataframe called `ca_pa`.
+
+```{r}
+library(tidyverse)
+ca_pa <- read_csv("../data/calif_penn_2011.csv")
+```
+
+b. How many rows and columns does the dataframe have?
+
+```{r}
+rows <- dim(ca_pa)[1]
+columns <- dim(ca_pa)[2]
+```
+
+c. Run this command, and explain, in words, what this does:
+
+**Ans:** this command can figure out the number of missing values in every column.
+
+```{r}
+colSums(apply(ca_pa,c(1,2),is.na))
+```
+
+d. The function `na.omit()` takes a dataframe and returns a new dataframe, omitting any row containing an NA value.  Use it to purge the data set of rows with incomplete data.
+
+```{r}
+ca_pa <- na.omit(ca_pa)
+```
+
+e. How many rows did this eliminate?
+
+```{r}
+rows - dim(ca_pa)[1]
+```
+
+f. Are your answers in (c) and (e) compatible? Explain.
+
+**Ans:** They are compatible. The command in (c) check the number of missing values in every column, and the command in (e) check the number of rows with incomplete data. We can infer that after purging, the number of missing values in every column will be zero. And we can use the command below to check out the truth.
+
+```{r}
+sum(colSums(apply(ca_pa,c(1,2),is.na)))
+```
+
+2. _This Very New House_ 
+
+a. The variable `Built_2005_or_later` indicates the percentage of houses in each Census tract built since 2005.  Plot median house prices against this variable.
+
+b. Make a new plot, or pair of plots, which breaks this out by state.  Note that the state is recorded in the `STATEFP` variable, with California being state 6 and Pennsylvania state 42.
