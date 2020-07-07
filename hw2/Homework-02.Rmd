@@ -1,7 +1,12 @@
 ---
-title: "Homework 2: Housing Price"
+title: "Homework 2"
 output: pdf_document
 ---
+```{r setup, message = F, include=FALSE}
+options(htmltools.dir.version = FALSE)
+library(tidyverse)
+library(DAAG)
+```
 
 The data set calif_penn_2011.csv contains information about the housing stock of California and Pennsylvania, as of 2011.  Information as aggregated into "Census tracts", geographic regions of a few thousand people which are supposed to be fairly homogeneous economically and socially.
 
@@ -46,5 +51,44 @@ for (tract in acca) {
   accamhv <- c(accamhv, ca_pa[tract,10])
 }
 median(accamhv)
+```
+
+MB.Ch1.11. Run the following code:
+```{r}
+gender <- factor(c(rep("female", 91), rep("male", 92)))
+table(gender)
+gender <- factor(gender, levels=c("male", "female"))
+table(gender)
+gender <- factor(gender, levels=c("Male", "female"))
+# Note the mistake: "Male" should be "male"
+table(gender)
+table(gender, exclude=NULL)
+rm(gender)  # Remove gender
+```
+Explain the output from the successive uses of table().
+     
+MB.Ch1.12. Write a function that calculates the proportion of values in a vector x that exceed some value cutoff.
+
+(a) Use the sequence of numbers 1, 2, . . . , 100 to check that this function gives the result that is expected.
+```{r}
+
+```
+
+(b) Obtain the vector ex01.36 from the Devore6 (or Devore7) package. These data give the times required for individuals to escape from an oil platform during a drill. Use dotplot() to show the distribution of times. Calculate the proportion of escape times that exceed 7 minutes.
+```{r}
+
+```
+
+MB.Ch1.18. The Rabbit data frame in the MASS library contains blood pressure change measurements on five rabbits (labeled as R1, R2, . . . ,R5) under various control and treatment conditions. Read the help file for more information. Use the unstack() function (three times) to convert Rabbit to the following form:
+
+Treatment Dose   R1   R2   R3   R4   R5 
+
+1 Control 6.25  0.50 1.00 0.75 1.25 1.5 
+
+2 Control 12.50 4.50 1.25 3.00 1.50 1.5 
+
+....
+```{r}
+
 ```
 
