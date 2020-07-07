@@ -70,23 +70,23 @@ sum(colSums(apply(ca_pa,c(1,2),is.na)))
 a. The variable `Built_2005_or_later` indicates the percentage of houses in each Census tract built since 2005.  Plot median house prices against this variable.
 
 ```{r}
-plot(ca_pa$Median_house_value, ca_pa$Built_2005_or_later,
-     xlab = "median house prices",
-     ylab = "percentage of houses built since 2005")
+plot(ca_pa$Median_house_value ~ ca_pa$Built_2005_or_later,
+     xlab = "percentage of houses built since 2005",
+     ylab = "median house prices")
 ```
 
 b. Make a new plot, or pair of plots, which breaks this out by state.  Note that the state is recorded in the `STATEFP` variable, with California being state 6 and Pennsylvania state 42.
 
 ```{r}
-plot(ca_pa$Median_house_value[ca_pa$STATEFP == 6],
-     ca_pa$Built_2005_or_later[ca_pa$STATEFP == 6],
-     xlab = "median house prices",
-     ylab = "percentage of houses built since 2005",
+plot(ca_pa$Built_2005_or_later[ca_pa$STATEFP == 6],
+     ca_pa$Median_house_value[ca_pa$STATEFP == 6],
+     xlab = "percentage of houses built since 2005",
+     ylab = "median house prices",
      main = "Houses in California")
-plot(ca_pa$Median_house_value[ca_pa$STATEFP == 42],
-     ca_pa$Built_2005_or_later[ca_pa$STATEFP == 42],
-     xlab = "median house prices",
-     ylab = "percentage of houses built since 2005",
+plot(ca_pa$Built_2005_or_later[ca_pa$STATEFP == 42],
+     ca_pa$Median_house_value[ca_pa$STATEFP == 42],
+     xlab = "percentage of houses built since 2005",
+     ylab = "median house prices",
      main = "Houses in Pennsylvania")
 ```
 
@@ -174,19 +174,19 @@ e. Make three plots, showing median house values against median income, for Alam
 
 ```{r}
 #Alameda
-plot(ca_pa$Median_house_value[ca_pa$STATEFP == 6 & ca_pa$COUNTYFP == 1],
-     ca_pa$Median_household_income[ca_pa$STATEFP == 6 & ca_pa$COUNTYFP == 1],
-     xlab = "median house values", ylab = "median income",
+plot(ca_pa$Median_household_income[ca_pa$STATEFP == 6 & ca_pa$COUNTYFP == 1],
+     ca_pa$Median_house_value[ca_pa$STATEFP == 6 & ca_pa$COUNTYFP == 1],
+     xlab = "median income", ylab = "median house values",
      main = "Houses in Alameda")
 # Santa Clara
-plot(ca_pa$Median_house_value[ca_pa$STATEFP == 6 & ca_pa$COUNTYFP == 85],
-     ca_pa$Median_household_income[ca_pa$STATEFP == 6 & ca_pa$COUNTYFP == 85],
-     xlab = "median house values", ylab = "median income",
+plot(ca_pa$Median_household_income[ca_pa$STATEFP == 6 & ca_pa$COUNTYFP == 85],
+     ca_pa$Median_house_value[ca_pa$STATEFP == 6 & ca_pa$COUNTYFP == 85],
+     xlab = "median income", ylab = "median house values",
      main = "Houses in Santa Clara")
 # Allegheny
-plot(ca_pa$Median_house_value[ca_pa$STATEFP == 42 & ca_pa$COUNTYFP == 3],
-     ca_pa$Median_household_income[ca_pa$STATEFP == 42 & ca_pa$COUNTYFP == 3],
-     xlab = "median house values", ylab = "median income",
+plot(ca_pa$Median_household_income[ca_pa$STATEFP == 42 & ca_pa$COUNTYFP == 3],
+     ca_pa$Median_house_value[ca_pa$STATEFP == 42 & ca_pa$COUNTYFP == 3],
+     xlab = "median income", ylab = "median house values",
      main = "Houses in Allegheny")
 ```
 

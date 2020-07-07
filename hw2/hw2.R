@@ -19,19 +19,19 @@ sum(colSums(apply(ca_pa,c(1,2),is.na)))
 
 ## 2
 # a
-plot(ca_pa$Median_house_value, ca_pa$Built_2005_or_later,
-     xlab = "median house prices",
-     ylab = "percentage of houses built since 2005")
+plot(ca_pa$Median_house_value ~ ca_pa$Built_2005_or_later,
+     xlab = "percentage of houses built since 2005",
+     ylab = "median house prices")
 # b
-plot(ca_pa$Median_house_value[ca_pa$STATEFP == 6],
-     ca_pa$Built_2005_or_later[ca_pa$STATEFP == 6],
-     xlab = "median house prices",
-     ylab = "percentage of houses built since 2005",
+plot(ca_pa$Built_2005_or_later[ca_pa$STATEFP == 6],
+     ca_pa$Median_house_value[ca_pa$STATEFP == 6],
+     xlab = "percentage of houses built since 2005",
+     ylab = "median house prices",
      main = "Houses in California")
-plot(ca_pa$Median_house_value[ca_pa$STATEFP == 42],
-     ca_pa$Built_2005_or_later[ca_pa$STATEFP == 42],
-     xlab = "median house prices",
-     ylab = "percentage of houses built since 2005",
+plot(ca_pa$Built_2005_or_later[ca_pa$STATEFP == 42],
+     ca_pa$Median_house_value[ca_pa$STATEFP == 42],
+     xlab = "percentage of houses built since 2005",
+     ylab = "median house prices",
      main = "Houses in Pennsylvania")
 
 ## 3
