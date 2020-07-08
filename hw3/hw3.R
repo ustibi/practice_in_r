@@ -46,3 +46,39 @@ for (city in 1:n) {
 }
 # d
 sqrt(((n-1)^2/n) * var(jackknifed.means))
+
+# 7
+plm.jackknife <- function(y0, a, N = gmp$pop, Y = gmp$pcgmp) {
+  y0.estimate <- c()
+  a.estimate <- c()
+  n <- length(N)
+  for (city in 1:n) {
+    temp_res <- plm(y0, a, N[-city], Y[-city])
+    y0.estimate <- c(y0.estimate, temp_res[1])
+    a.estimate <- c(y0.estimate, temp_res[2])
+  }
+  y0.std_err <- sqrt(((n-1)^2/n) * var(y0.estimate))
+  a.std_err <- sqrt(((n-1)^2/n) * var(a.estimate))
+  return(c(y0.std_err, a.std_err))
+}
+plm.jackknife(6611, 1/8)
+
+# 8
+# the file "gmp-2013.dat" is downloaded in
+# https://www.stat.cmu.edu/~cshalizi/statcomp/14/hw/04/gmp-2013.dat
+gmp.2013 <- read.table("data/gmp-2013.dat")
+gmp.2013$pop <- round(gmp.2013$gmp / gmp.2013$pcgmp)
+# plm(6611, 0.15)
+# ## [1] 6.611000e+03 1.263182e-01 6.185706e+07
+plm(6611, 1/8, gmp.2013$pop, gmp.2013$pcgmp)
+# plm.jackknife(6611, 1/8)
+# ## [1] 1.136653e-08 6.583823e+03
+plm.jackknife(6611, 1/8, gmp.2013$pop, gmp.2013$pcgmp)
+
+plot(gmp.2013$pcgmp ~ gmp.2013$pop, log = "x",
+     xlab = "population", ylab = "per capita GMP",
+     main = "US Metropolitan Areas, 2013")
+curve(6.611000e+03*x^(1.263182e-01), add = TRUE, col = "blue")
+curve(6.611000e+03*x^(1.433688e-01), add = TRUE, col = "red")
+
+rm(list = ls())
