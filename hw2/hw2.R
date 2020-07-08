@@ -113,3 +113,31 @@ plot(ca_pa$Median_house_value[ca_pa$STATEFP == 42 & ca_pa$COUNTYFP == 3],
      ca_pa$Median_household_income[ca_pa$STATEFP == 42 & ca_pa$COUNTYFP == 3],
      xlab = "median house values", ylab = "median income",
      main = "Houses in Allegheny")
+
+# MB.Ch1.11
+gender <- factor(c(rep("female", 91), rep("male", 92)))
+table(gender)
+gender <- factor(gender, levels=c("male", "female"))
+table(gender)
+gender <- factor(gender, levels=c("Male", "female"))
+# Note the mistake: "Male" should be "male"
+table(gender)
+table(gender, exclude=NULL)
+rm(gender)  # Remove gender
+
+# MB.Ch1.12
+cutoff_proportion <- function(x, cutoff) {
+  return(sum(x > cutoff) / length(x))
+}
+#a
+cutoff_proportion(seq(1, 100), 50)
+
+#MB.Ch1.18
+rabbit <- MASS::Rabbit
+treatment <- unstack(rabbit, Treatment ~ Animal)
+dose <- unstack(rabbit, Dose ~ Animal)
+bpc <- unstack(rabbit, BPchange ~ Animal)
+rabbit <- data.frame(treatment[, 1], dose[, 1], bpc)
+name <- c("Treatment", "Dose", "R1", "R2", "R3", "R4", "R5")
+names(rabbit) <- name
+rabbit
