@@ -2,7 +2,7 @@
 title: "Homework 2 - Report"
 CJKmainfont: SimSun
 author: "3170105743 李政达"
-date: "2020/7/7"
+date: "2020/7/8"
 output:
   pdf_document:
     includes:
@@ -125,6 +125,8 @@ plot(ca_pa$Median_house_value[ca_pa$STATEFP == 42],
      xlab = "median house prices", ylab = "vacancy rate",
      main = "Houses in Pennsylvania")
 ```
+
+The houses in California have higher median house value, and houses with different median house value all have some samples whose vacancy rate is high. The houses in Pennsylvania have lower median house value, and only houses with low median house value have samples whose vacancy rate is high.
 
 4. The column `COUNTYFP` contains a numerical code for counties within each state.  We are interested in Alameda County (county 1 in California), Santa Clara (county 85 in California), and Allegheny County (county 3 in Pennsylvania).
 
