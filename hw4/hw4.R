@@ -10,10 +10,12 @@ ckm_nodes <- ckm_nodes[valid_nodes, ]
 doc.info <- data.frame("doctor" = rep(seq(1, 125), each = 17),
                        "month" = rep(seq(1, 17), time = 125))
 doc.info$begin <- ckm_nodes$adoption_date[doc.info$doctor] == doc.info$month
-doc.info$before <- ckm_nodes$adoption_date[doc.info$doctor] <= doc.info$month
+doc.info$before <- ckm_nodes$adoption_date[doc.info$doctor] < doc.info$month
 # Try not to use any loops
+max.k <- 0
 for (person in 1:125) {
   contacts <- which(ckm_network[person, ] == TRUE)
+  max.k <- max(max.k, length(contacts))
   for (month in 1:17) {
     doc.info$num_strict_before[17*(person-1)+month] <-
       sum(ckm_nodes$adoption_date[contacts] < month)
@@ -21,3 +23,22 @@ for (person in 1:125) {
       sum(ckm_nodes$adoption_date[contacts] <= month)
   }
 }
+
+# m <- doc.info %>% 
+#   group_by(doctor) %>% 
+#   summarise(max_num = max(num_begin_before)) %>% 
+#   ungroup()
+
+# 3
+# b
+pk <- qk <- c()
+for (k in 0:20) {
+  obs <- doc.info %>% filter(num_strict_before == k)
+  pk[k] = sum(obs$begin) / dim(obs)[1]
+  obs <- doc.info %>%
+    filter(num_begin_before == k)
+  qk[k] = sum(obs$begin) / dim(obs)[1]
+}
+# c
+plot(pk ~ seq(0,length(pk)-1))
+plot(qk ~ seq(0,length(qk)-1))

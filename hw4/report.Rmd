@@ -11,6 +11,7 @@ output:
     keep_tex: no
     latex_engine: xelatex
 
+
 ---
 
 ```{r setup, include=FALSE}
@@ -34,17 +35,40 @@ ckm_network <- read.table("../data/ckm_network.dat")
 
 2. Create a new data frame which records, for every doctor, for every month, whether that doctor began prescribing tetracycline that month, whether they had adopted tetracycline before that month, the number of their contacts who began prescribing strictly _before_ that month, and the number of their contacts who began prescribing in that month or earlier.  Explain why the dataframe should have 6 columns, and 2125 rows.  Try not to use any loops.
 
-3.  Let
-    \[
-    p_k = \Pr(\text{A doctor starts prescribing tetracycline this month} \mid \\
-    \text{Number of doctor's contacts prescribing before this month}=k)
-    \]
-    and
+   ```{r}
+   doc.info <- data.frame("doctor" = rep(seq(1, 125), each = 17),
+                          "month" = rep(seq(1, 17), time = 125))
+   doc.info$begin <- ckm_nodes$adoption_date[doc.info$doctor] == doc.info$month
+   doc.info$before <- ckm_nodes$adoption_date[doc.info$doctor] < doc.info$month
+   max.k <- 0
+   for (person in 1:125) {
+     contacts <- which(ckm_network[person, ] == TRUE)
+     max.k <- max(max.k, length(contacts))
+     for (month in 1:17) {
+       doc.info$num_strict_before[17*(person-1)+month] <-
+         sum(ckm_nodes$adoption_date[contacts] < month)
+       doc.info$num_begin_before[17*(person-1)+month] <-
+         sum(ckm_nodes$adoption_date[contacts] <= month)
+     }
+   }
+   ```
+
+   **Ans:** In order to distinguish the different doctors and different months, we need to list all the combinations of doctors and months, which need two columns and $125\times17=2125$ rows. We also need to record the four attributes asked, which need four columns. In conclusion, the dataframe should have 6 columns and 2125 rows.
+
+3. Let
+   \[
+   p_k = \Pr(\text{A doctor starts prescribing tetracycline this month} \mid \\
+   \text{Number of doctor's contacts prescribing before this month}=k)
+   \]
+   and
    \[
      q_k = \Pr(\text{A doctor starts prescribing tetracycline this month} \mid \\ \text{Number of doctor's contacts prescribing this month}=k)
     \]
    We suppose that $p_k$ and $q_k$ are the same for all months.
      a. Explain why there should be no more than $21$ values of $k$ for which we can estimate $p_k$ and $q_k$ directly from the data.
+
+   **Ans:** We can find that the maximum a doctor can contact is 20. So there are at most 21 valid values of k, which is from 0 to 20. In fact, in consideration of that there may exist k so that all the doctors whose number of doctor's contacts prescribing is not equal to k, which means that $p_k$ or $q_k$ is meaningless, the number of real valid k may be less than 21.
+
      b. Create a vector of estimated $p_k$ probabilities, using the data frame from (2).  Plot the probabilities against the number of prior-adoptee contacts $k$.
      b. Create a vector of estimated $q_k$ probabilities, using the data frame from (2). Plot the probabilities against the number of prior-or-contemporary-adoptee contacts $k$.
 
