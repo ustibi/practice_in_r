@@ -55,7 +55,7 @@ plm.jackknife <- function(y0, a, N = gmp$pop, Y = gmp$pcgmp) {
   for (city in 1:n) {
     temp_res <- plm(y0, a, N[-city], Y[-city])
     y0.estimate <- c(y0.estimate, temp_res[1])
-    a.estimate <- c(y0.estimate, temp_res[2])
+    a.estimate <- c(a.estimate, temp_res[2])
   }
   y0.std_err <- sqrt(((n-1)^2/n) * var(y0.estimate))
   a.std_err <- sqrt(((n-1)^2/n) * var(a.estimate))
