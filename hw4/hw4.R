@@ -1,6 +1,7 @@
 rm(list = ls())
-ckm_nodes <- read.csv("data/ckm_nodes.csv")
-ckm_network <- read.table("data/ckm_network.dat")
+library(tidyverse)
+ckm_nodes <- read_csv("data/ckm_nodes.csv")
+ckm_network <- read_table("data/ckm_network.dat", col_names = FALSE)
 # 1
 valid_nodes <- !is.na(ckm_nodes$adoption_date)
 ckm_network <- ckm_network[valid_nodes, valid_nodes]
@@ -9,36 +10,110 @@ ckm_nodes <- ckm_nodes[valid_nodes, ]
 # 2
 doc.info <- data.frame("doctor" = rep(seq(1, 125), each = 17),
                        "month" = rep(seq(1, 17), time = 125))
-doc.info$begin <- ckm_nodes$adoption_date[doc.info$doctor] == doc.info$month
-doc.info$before <- ckm_nodes$adoption_date[doc.info$doctor] < doc.info$month
-# Try not to use any loops
-max.k <- 0
-for (person in 1:125) {
-  contacts <- which(ckm_network[person, ] == TRUE)
-  max.k <- max(max.k, length(contacts))
-  for (month in 1:17) {
-    doc.info$num_strict_before[17*(person-1)+month] <-
-      sum(ckm_nodes$adoption_date[contacts] < month)
-    doc.info$num_begin_before[17*(person-1)+month] <-
-      sum(ckm_nodes$adoption_date[contacts] <= month)
-  }
-}
+doc.info <- doc.info %>% 
+  mutate(begin = ckm_nodes$adoption_date[doc.info$doctor] == doc.info$month)%>%
+  mutate(before = ckm_nodes$adoption_date[doc.info$doctor] < doc.info$month)
+contact <- ckm_network[rep(1:125, each = 17), ]
+m1 <- matrix(ckm_nodes$adoption_date[doc.info$doctor] < doc.info$month,
+             nrow = 17)
+m2 <- matrix(ckm_nodes$adoption_date[doc.info$doctor] <= doc.info$month,
+             nrow = 17)
+doc.info <- doc.info %>% 
+  mutate(num_strict_before = rowSums(m1[rep(seq(1,17), time = 125), ] &
+                                       contact)) %>% 
+  mutate(num_begin_before = rowSums(m2[rep(seq(1,17), time = 125), ] &
+                                       contact))
 
-# m <- doc.info %>% 
-#   group_by(doctor) %>% 
-#   summarise(max_num = max(num_begin_before)) %>% 
-#   ungroup()
+# max.k <- 0
+# for (person in 1:125) {
+#   contacts <- which(ckm_network[person, ] == TRUE)
+#   max.k <- max(max.k, length(contacts))
+#   for (month in 1:17) {
+#     doc.info$num_strict_before[17*(person-1)+month] <-
+#       sum(ckm_nodes$adoption_date[contacts] < month)
+#     doc.info$num_begin_before[17*(person-1)+month] <-
+#       sum(ckm_nodes$adoption_date[contacts] <= month)
+#   }
+# }
 
 # 3
+# a
+max(apply(ckm_network, 1,sum))
 # b
 pk <- qk <- c()
 for (k in 0:20) {
   obs <- doc.info %>% filter(num_strict_before == k)
-  pk[k] = sum(obs$begin) / dim(obs)[1]
+  pk[k+1] <- sum(obs$begin) / dim(obs)[1]
   obs <- doc.info %>%
-    filter(num_begin_before == k)
-  qk[k] = sum(obs$begin) / dim(obs)[1]
+    filter(num_begin_before - num_strict_before == k)
+  qk[k+1] <- sum(obs$begin) / dim(obs)[1]
 }
 # c
-plot(pk ~ seq(0,length(pk)-1))
-plot(qk ~ seq(0,length(qk)-1))
+prop <- data.frame(k = 0:20, pk, qk)
+prop %>% 
+  ggplot(aes(x = k, y = pk)) +
+  geom_point() + 
+  labs(x = "the number of prior-adoptee contacts k",
+       y = "the probabilities pk", 
+       title = "pk ~ k") +
+  theme_bw()
+prop %>% 
+  ggplot(aes(x = k, y = qk)) +
+  geom_point() + 
+  labs(x = "the number of prior-or-contemporary-adoptee contacts k",
+       y = "the probabilities qk", 
+       title = "qk ~ k") +
+  theme_bw()
+
+# 4
+# a
+prop <- prop %>% 
+  filter(!is.na(pk)) %>% 
+  select(-qk)
+mse1 <- function(parameters, x = prop$k, y = prop$pk) {
+  a <- parameters[1]
+  b <- parameters[2]
+  y.estimate = a + b * x
+  return(sum((y - y.estimate) ^ 2) / length(x))
+}
+par1 <- nlm(mse1, c(0, 0))
+par1$estimate[1]
+par1$estimate[2]
+# b
+mse2 <- function(parameters, x = prop$k, y = prop$pk) {
+  a <- parameters[1]
+  b <- parameters[2]
+  y.estimate = exp(a + b * x) / (1 + exp(a + b * x))
+  return(sum((y - y.estimate) ^ 2) / length(x))
+}
+par2 <- nlm(mse2, c(0, 0))
+par2$estimate[1]
+par2$estimate[2]
+# c
+a <- par1$estimate[1]
+b <- par1$estimate[2]
+prop1 <- data.frame(k = rep(prop$k, time = 2),
+                    pk = c(prop$pk, a+b*prop$k),
+                    group = rep(c("original", "estimate"),
+                                each=length(prop$k)))
+prop1 %>%
+  ggplot(aes(x = k, y = pk)) +
+  geom_point(aes(colour = group)) +
+  labs(x = "the number of prior-adoptee contacts k",
+       y = "the probabilities pk",
+       title = "pk ~ k") +
+  theme_bw()
+
+a <- par2$estimate[1]
+b <- par2$estimate[2]
+prop2 <- data.frame(k = rep(prop$k, time = 2),
+                    pk = c(prop$pk, exp(a+b*prop$k)/(1+exp(a+b*prop$k))),
+                    group = rep(c("original", "estimate"),
+                               each=length(prop$k)))
+prop2 %>%
+  ggplot(aes(x = k, y = pk)) +
+  geom_point(aes(colour = group)) +
+  labs(x = "the number of prior-adoptee contacts k",
+       y = "the probabilities pk",
+       title = "pk ~ k") +
+  theme_bw()
