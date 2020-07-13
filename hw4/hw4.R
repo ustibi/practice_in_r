@@ -22,7 +22,7 @@ doc.info <- doc.info %>%
   mutate(num_strict_before = rowSums(m1[rep(seq(1,17), time = 125), ] &
                                        contact)) %>% 
   mutate(num_begin_before = rowSums(m2[rep(seq(1,17), time = 125), ] &
-                                       contact))
+                                      contact))
 
 # max.k <- 0
 # for (person in 1:125) {
@@ -38,7 +38,9 @@ doc.info <- doc.info %>%
 
 # 3
 # a
-max(apply(ckm_network, 1,sum))
+max(apply(ckm_network, 1, sum))
+s <- apply(ckm_network, 1, sum)
+summary(s)
 # b
 pk <- qk <- c()
 for (k in 0:20) {
@@ -109,7 +111,7 @@ b <- par2$estimate[2]
 prop2 <- data.frame(k = rep(prop$k, time = 2),
                     pk = c(prop$pk, exp(a+b*prop$k)/(1+exp(a+b*prop$k))),
                     group = rep(c("original", "estimate"),
-                               each=length(prop$k)))
+                                each=length(prop$k)))
 prop2 %>%
   ggplot(aes(x = k, y = pk)) +
   geom_point(aes(colour = group)) +
@@ -117,3 +119,37 @@ prop2 %>%
        y = "the probabilities pk",
        title = "pk ~ k") +
   theme_bw()
+
+par1$minimum
+par2$minimum
+
+# Extra
+pk <- Vk <- c()
+for (k in 0:20) {
+  obs <- doc.info %>% filter(num_strict_before == k)
+  pk[k+1] <- sum(obs$begin) / dim(obs)[1]
+  Vk[k+1] <- pk[k+1] * (1 - pk[k+1]) / dim(obs)[1]
+}
+prop <- data.frame(k = 0:20, pk, Vk)
+prop <- prop %>% 
+  filter(!is.na(pk))
+
+mse3 <- function(parameters, x = prop$k, y = prop$pk, V = prop$Vk) {
+  a <- parameters[1]
+  b <- parameters[2]
+  y.estimate = a + b * x
+  return(sum((y - y.estimate) ^ 2 / V) / length(x))
+}
+par3 <- nlm(mse3, c(1, 1))
+par3$estimate[1]
+par3$estimate[2]
+
+mse4 <- function(parameters, x = prop$k, y = prop$pk, V = prop$Vk) {
+  a <- parameters[1]
+  b <- parameters[2]
+  y.estimate = exp(a + b * x) / (1 + exp(a + b * x))
+  return(sum((y - y.estimate) ^ 2 / V) / length(x))
+}
+par4 <- nlm(mse4, c(0, 0))
+par4$estimate[1]
+par4$estimate[2]
