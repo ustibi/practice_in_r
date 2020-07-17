@@ -13,6 +13,7 @@ output:
 
 
 
+
 ---
 
 ```{r setup, include=FALSE}
@@ -186,3 +187,72 @@ ckm_network <- read_table("../data/ckm_network.dat", col_names = FALSE)
    So I prefer the model in 4b.
 
 _For quibblers, pedants, and idle hands itching for work to do_: The $p_k$ values from problem 3 aren't all equally precise, because they come from different numbers of observations.  Also, if each doctor with $k$ adoptee contacts is independently deciding whether or not to adopt with probability $p_k$, then the variance in the number of adoptees will depend on $p_k$.  Say that the actual proportion who decide to adopt is $\hat{p}_k$.  A little probability (exercise!) shows that in this situation, $\mathbb{E}[\hat{p}_k] = p_k$, but that $\mathrm{Var}[\hat{p}_k] = p_k(1-p_k)/n_k$, where $n_k$ is the number of doctors in that situation.  (We estimate probabilities more precisely when they're really extreme [close to 0 or 1], and/or we have lots of observations.)  We can estimate that variance as $\hat{V}_k = \hat{p}_k(1-\hat{p}_k)/n_k$.  Find the $\hat{V}_k$, and then re-do the estimation in (4a) and (4b) where the squared error for $p_k$ is divided by $\hat{V}_k$.  How much do the parameter estimates change?  How much do the plotted curves in (4c) change?
+
+**Ans:** In order to estimate the $p_k$, we should delete the $\hat{V}_k$ whose value is zero.
+
+```{r}
+pk <- Vk <- c()
+for (k in 0:20) {
+  obs <- doc.info %>% filter(num_strict_before == k)
+  pk[k+1] <- sum(obs$begin) / dim(obs)[1]
+  Vk[k+1] <- pk[k+1] * (1 - pk[k+1]) / dim(obs)[1]
+}
+prop <- data.frame(k = 0:20, pk, Vk)
+prop <- prop %>% 
+  filter(!is.na(pk)) %>% 
+  filter(Vk != 0)
+```
+
+Then we can use the same method to estimate the parameters.
+
+```{r}
+mse3 <- function(parameters, x = prop$k, y = prop$pk, V = prop$Vk) {
+  a <- parameters[1]
+  b <- parameters[2]
+  y.estimate = a + b * x
+  return(sum((y - y.estimate) ^ 2 / V) / length(x))
+}
+par3 <- nlm(mse3, c(0, 0))
+a <- par3$estimate[1]
+b <- par3$estimate[2]
+
+c(a, b)
+
+prop3 <- data.frame(k = rep(prop$k, time = 2),
+                    pk = c(prop$pk, a+b*prop$k),
+                    group = rep(c("original", "estimate"),
+                                each=length(prop$k)))
+prop3 %>%
+  ggplot(aes(x = k, y = pk)) +
+  geom_point(aes(colour = group)) +
+  labs(x = "the number of prior-adoptee contacts k",
+       y = "the probabilities pk",
+       title = "pk ~ k") +
+  theme_bw()
+
+
+mse4 <- function(parameters, x = prop$k, y = prop$pk, V = prop$Vk) {
+  a <- parameters[1]
+  b <- parameters[2]
+  y.estimate = exp(a + b * x) / (1 + exp(a + b * x))
+  return(sum((y - y.estimate) ^ 2 / V) / length(x))
+}
+par4 <- nlm(mse4, c(0, 0))
+a <- par4$estimate[1]
+b <- par4$estimate[2]
+
+c(a, b)
+
+prop4 <- data.frame(k = rep(prop$k, time = 2),
+                    pk = c(prop$pk, exp(a+b*prop$k)/(1+exp(a+b*prop$k))),
+                    group = rep(c("original", "estimate"),
+                                each=length(prop$k)))
+prop4 %>%
+  ggplot(aes(x = k, y = pk)) +
+  geom_point(aes(colour = group)) +
+  labs(x = "the number of prior-adoptee contacts k",
+       y = "the probabilities pk",
+       title = "pk ~ k") +
+  theme_bw()
+```
+

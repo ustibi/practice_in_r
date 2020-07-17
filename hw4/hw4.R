@@ -132,7 +132,8 @@ for (k in 0:20) {
 }
 prop <- data.frame(k = 0:20, pk, Vk)
 prop <- prop %>% 
-  filter(!is.na(pk))
+  filter(!is.na(pk)) %>% 
+  filter(Vk != 0)
 
 mse3 <- function(parameters, x = prop$k, y = prop$pk, V = prop$Vk) {
   a <- parameters[1]
@@ -140,9 +141,22 @@ mse3 <- function(parameters, x = prop$k, y = prop$pk, V = prop$Vk) {
   y.estimate = a + b * x
   return(sum((y - y.estimate) ^ 2 / V) / length(x))
 }
-par3 <- nlm(mse3, c(1, 1))
-par3$estimate[1]
-par3$estimate[2]
+par3 <- nlm(mse3, c(0, 0))
+a <- par3$estimate[1]
+b <- par3$estimate[2]
+
+prop3 <- data.frame(k = rep(prop$k, time = 2),
+                    pk = c(prop$pk, a+b*prop$k),
+                    group = rep(c("original", "estimate"),
+                                each=length(prop$k)))
+prop3 %>%
+  ggplot(aes(x = k, y = pk)) +
+  geom_point(aes(colour = group)) +
+  labs(x = "the number of prior-adoptee contacts k",
+       y = "the probabilities pk",
+       title = "pk ~ k") +
+  theme_bw()
+
 
 mse4 <- function(parameters, x = prop$k, y = prop$pk, V = prop$Vk) {
   a <- parameters[1]
@@ -151,5 +165,17 @@ mse4 <- function(parameters, x = prop$k, y = prop$pk, V = prop$Vk) {
   return(sum((y - y.estimate) ^ 2 / V) / length(x))
 }
 par4 <- nlm(mse4, c(0, 0))
-par4$estimate[1]
-par4$estimate[2]
+a <- par4$estimate[1]
+b <- par4$estimate[2]
+
+prop4 <- data.frame(k = rep(prop$k, time = 2),
+                    pk = c(prop$pk, exp(a+b*prop$k)/(1+exp(a+b*prop$k))),
+                    group = rep(c("original", "estimate"),
+                                each=length(prop$k)))
+prop4 %>%
+  ggplot(aes(x = k, y = pk)) +
+  geom_point(aes(colour = group)) +
+  labs(x = "the number of prior-adoptee contacts k",
+       y = "the probabilities pk",
+       title = "pk ~ k") +
+  theme_bw()
