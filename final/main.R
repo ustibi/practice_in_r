@@ -1,3 +1,5 @@
+rm(list = ls())
+
 library(tidyverse)
 library(corrplot)
 train <- read_csv("final/train.csv")
@@ -51,6 +53,13 @@ summary(linear.model.4)
 
 par(mfrow = c(2,2))
 plot(linear.model.4)
+
+
+pre <- predict(linear.model.3, test, interval = "prediction", level = 0.95)
+
+sub <- data.frame(Id = test$Id, SalePrice = pre[, 1])
+
+predict(linear.model.4, test, interval="prediction", level=0.95)
 
 
 # 预测

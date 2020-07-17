@@ -1,0 +1,46 @@
+---
+title: "数学实践大作业 - 房价预测问题"
+author: "3170105743 李政达"
+documentclass: ctexart
+output:
+  rticles::ctex:
+    fig_caption: yes
+    number_sections: yes
+    toc: yes
+classoption: "hyperref,"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+# 问题描述
+
+对于一个房屋购买者，决定其心仪的房子的因素是多样的。例如，尽管房屋地下室到天花板的高度或者房屋与铁路的距离并不是一个特别重要的因素，但是亦有数据表明这些因素对于房价的影响力是高于房屋卧室的数量或是栅栏的颜色等因素的。
+
+具体而言，本文试图通过已有的包含79个解释变量与的1460个观察值训练[数据集](https://www.kaggle.com/c/house-prices-advanced-regression-techniques)，建立房价关于其中若干解释变量的模型，并通过此模型对房价进行预测。
+
+```{r, eval=FALSE}
+# data
+library(tidyverse)
+library(corrplot)
+train <- read_csv("train.csv")
+test <- read_csv("test.csv")
+dim(train) - c(0, 2) # without SalePrice and Id
+```
+
+# 使用模型
+
+本文考虑使用较为基本的线性回归模型，并在回归变量的选取上进行了一定的研究。
+
+## 线性回归模型
+
+在统计学中，线性回归是利用称为线性回归方程的最小二乘函数对一个或多个自变量和因变量之间关系进行建模的一种回归分析。这种函数是一个或多个称为回归系数的模型参数的线性组合。只有一个自变量的情况称为简单回归，大于一个自变量情况的叫做多元回归（multivariable linear regression）[[1]](https://zh.wikipedia.org/wiki/%E7%B7%9A%E6%80%A7%E5%9B%9E%E6%AD%B8)。
+
+## 自变量选取
+
+自变量的选取是回归分析中很重要的环节之一。
+
+本文首先尝试了kitchen sink模型[[2]](https://subscription.packtpub.com/book/big_data_and_business_intelligence/9781785288142/8/ch08lvl1sec67/kitchen-sink-regression)。当回归的目标仅仅是预测并建模时，自变量对整个模型的决定程度并不是关键的考察因素。一个简单的想法是将所有可能的自变量全部作为预测变量，并通过多元回归的方法来建立模型。这种回归方式便是kitchen sink回归。
+
+此外，本文亦试图对预测变量进行精简。相关系数是反映两组变量相关性的重要指标，一般而言，相关系数的绝对值越高，可认为两组变量相关程度较大。本文从相关系数入手，选取与房价相关系数绝对值较高的两组指标作为预测变量，建立了线性回归模型。
