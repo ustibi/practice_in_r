@@ -18,8 +18,13 @@ train_values <- train_values %>%
   filter(num_na == 0) %>% 
   select(-num_na)
 
+dim(train_values)
+
 train %>% ggplot(aes(x = SalePrice)) + 
   geom_histogram(bins = 100, alpha = 0.8)
+x <- min(train$SalePrice):10:max(train$SalePrice)
+plot(x,dlnorm(x,mean(train$SalePrice),sd(train$SalePrice)),type="l")
+
 
 # 考察协方差
 correlations <- cor(train_values %>% select(-Id))
@@ -53,6 +58,14 @@ summary(linear.model.4)
 
 par(mfrow = c(2,2))
 plot(linear.model.4)
+
+p <- predict(linear.model.4, train_values)
+mse(p)
+
+
+mse <- function(x, y = train_values$SalePrice) {
+  return(sum((x-y)^2) / length(y))
+}
 
 
 pre <- predict(linear.model.3, test, interval = "prediction", level = 0.95)

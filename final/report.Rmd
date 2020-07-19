@@ -1,5 +1,5 @@
 ---
-title: "数学实践大作业 - 房价预测问题"
+title: "大作业：房价预测问题"
 author: "3170105743 李政达"
 documentclass: ctexart
 output:
@@ -8,6 +8,7 @@ output:
     number_sections: yes
     toc: yes
 classoption: "hyperref,"
+
 ---
 
 ```{r setup, include=FALSE}
@@ -18,9 +19,9 @@ knitr::opts_chunk$set(echo = FALSE)
 
 对于一个房屋购买者，决定其心仪的房子的因素是多样的。例如，尽管房屋地下室到天花板的高度或者房屋与铁路的距离并不是一个特别重要的因素，但是亦有数据表明这些因素对于房价的影响力是高于房屋卧室的数量或是栅栏的颜色等因素的。
 
-具体而言，本文试图通过已有的包含79个解释变量与的1460个观察值训练[数据集](https://www.kaggle.com/c/house-prices-advanced-regression-techniques)，建立房价关于其中若干解释变量的模型，并通过此模型对房价进行预测。
+具体而言，本文试图通过已有的包含79个解释变量与的1460个观察值训练数据集[[1]](https://www.kaggle.com/c/house-prices-advanced-regression-techniques)，建立房价关于其中若干解释变量的模型，并通过此模型对房价进行预测。
 
-```{r, eval=FALSE}
+```{r, include=FALSE}
 # data
 library(tidyverse)
 library(corrplot)
@@ -35,12 +36,102 @@ dim(train) - c(0, 2) # without SalePrice and Id
 
 ## 线性回归模型
 
-在统计学中，线性回归是利用称为线性回归方程的最小二乘函数对一个或多个自变量和因变量之间关系进行建模的一种回归分析。这种函数是一个或多个称为回归系数的模型参数的线性组合。只有一个自变量的情况称为简单回归，大于一个自变量情况的叫做多元回归（multivariable linear regression）[[1]](https://zh.wikipedia.org/wiki/%E7%B7%9A%E6%80%A7%E5%9B%9E%E6%AD%B8)。
+在统计学中，线性回归是利用称为线性回归方程的最小二乘函数对一个或多个自变量和因变量之间关系进行建模的一种回归分析。这种函数是一个或多个称为回归系数的模型参数的线性组合。只有一个自变量的情况称为简单回归，大于一个自变量情况的叫做多元回归（multivariable linear regression）[[2]](https://zh.wikipedia.org/wiki/%E7%B7%9A%E6%80%A7%E5%9B%9E%E6%AD%B8)。
 
 ## 自变量选取
 
 自变量的选取是回归分析中很重要的环节之一。
 
-本文首先尝试了kitchen sink模型[[2]](https://subscription.packtpub.com/book/big_data_and_business_intelligence/9781785288142/8/ch08lvl1sec67/kitchen-sink-regression)。当回归的目标仅仅是预测并建模时，自变量对整个模型的决定程度并不是关键的考察因素。一个简单的想法是将所有可能的自变量全部作为预测变量，并通过多元回归的方法来建立模型。这种回归方式便是kitchen sink回归。
+本文首先尝试了kitchen sink模型[[3]](https://subscription.packtpub.com/book/big_data_and_business_intelligence/9781785288142/8/ch08lvl1sec67/kitchen-sink-regression)。当回归的目标仅仅是预测并建模时，自变量对整个模型的决定程度并不是关键的考察因素。一个简单的想法是将所有可能的自变量全部作为预测变量，并通过多元回归的方法来建立模型。这种回归方式便是kitchen sink回归。
 
 此外，本文亦试图对预测变量进行精简。相关系数是反映两组变量相关性的重要指标，一般而言，相关系数的绝对值越高，可认为两组变量相关程度较大。本文从相关系数入手，选取与房价相关系数绝对值较高的两组指标作为预测变量，建立了线性回归模型。
+
+# 数据分析
+
+## 房价的分布
+
+首先考虑房价的大致分布情况。使用`ggplot`包提供的函数可绘制其分布的直方图：
+
+```{r}
+train %>% ggplot(aes(x = SalePrice)) + 
+  geom_histogram(bins = 100, alpha = 0.8)
+```
+
+可见房价的分布呈正偏态，多数房价位于$2\times10^5$内，而仅有极少的房价超过$4\times10^5$。
+
+## 数据的清洗
+
+本文主要考虑有具体数值的影响因素，因而首先对非数值项进行了筛选。
+
+```{r, include=FALSE}
+# 保留数值项
+numeric_col <- names(train[, sapply(train, is.numeric) == TRUE])
+train_values <- train %>% 
+  select(all_of(numeric_col))
+```
+
+此外，在训练集中有NA项的数据观察值不能进行训练，因此考虑去除所有含有NA项的观察值。
+
+```{r, include=FALSE}
+# 清除NA
+train_values$num_na = apply(is.na(train_values), 1, sum)
+train_values <- train_values %>% 
+  filter(num_na == 0) %>% 
+  select(-num_na)
+```
+
+清洗后的数据共含有36个解释变量与1121个有效观察值。
+
+```{r, include=FALSE}
+dim(train_values)
+```
+
+## 建立回归模型
+
+### 加入较多自变量
+
+使用kitchen sink model得到结果如下：
+
+```{r}
+# kitchen sink model
+linear.model.1 <- lm(SalePrice ~ . -Id, data = train_values)
+summary(linear.model.1)
+# plot
+par(mfrow = c(2,2))
+plot(linear.model.1)
+```
+
+在回归的系数中存在NA项，需要在预测时将其去除；修正后的$R^2$值为0.8036，可见该模型尽管使用了较多的自变量，但拟合效果仍较为一般。
+
+### 通过相关系数寻找自变量
+
+为了寻找与SalePrice最为相关的变量，首先应计算各变量间的相关系数，尤其需要考虑各个变量与SalePrice的相关系数。
+
+```{r}
+# 考察协方差
+correlations <- cor(train_values %>% select(-Id))
+cor_sorted <- as.matrix(sort(correlations[,'SalePrice'], decreasing = TRUE))
+cor_high <- names(which(apply(cor_sorted, 1, function(x) abs(x)>0.5)))
+corrplot.mixed(correlations[cor_high, cor_high], tl.col="black", tl.pos = "lt")
+```
+
+由上图可看出，OverallQual与GrLivArea两项与SalePrice有较高的相关系数，可考虑以这两项为自变量进行线性回归，结果如下：
+
+```{r}
+# OverallQual & GrLivArea
+linear.model.2 <- lm(SalePrice ~ OverallQual + GrLivArea, data = train_values)
+summary(linear.model.2)
+# plot
+par(mfrow = c(2,2))
+plot(linear.model.2)
+```
+
+虽然其修正后$R^2$项低于kitchen sink model，但由于该模型自变量较少，计算较为简单，且不含有NA项，也有一定应用价值。
+
+# 结果评价
+
+## 评价指标
+
+## 各模型的表现
+
+## 改进思路
