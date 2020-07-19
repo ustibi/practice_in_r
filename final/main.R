@@ -59,13 +59,30 @@ summary(linear.model.4)
 par(mfrow = c(2,2))
 plot(linear.model.4)
 
-p <- predict(linear.model.4, train_values)
-mse(p)
 
-
-mse <- function(x, y = train_values$SalePrice) {
-  return(sum((x-y)^2) / length(y))
+RMSD <- function(x, y) {
+  return(sqrt(sum((x-y)^2) / length(y)))
 }
+
+evaluate <- function(x, y = train_values$SalePrice) {
+  x <- log(x)
+  y <- log(y)
+  return(RMSD(x, y))
+}
+
+p <- predict(linear.model.4, train_values)
+evaluate(p)
+
+p <- predict(linear.model.4, test)
+
+p1 <- predict(linear.model.3, train_values)
+p2 <- train_values$OverallQual*coef[2] + train_values$GrLivArea*coef[3]
+
+p <- predict(linear.model.3, test)
+p <- test$OverallQual*coef[2] + test$GrLivArea*coef[3]
+
+sub <- data.frame(Id = test$Id, SalePrice = p)
+write.csv(sub, file = "final/submission2.csv")
 
 
 pre <- predict(linear.model.3, test, interval = "prediction", level = 0.95)
