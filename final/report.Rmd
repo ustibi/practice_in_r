@@ -9,9 +9,6 @@ output:
     toc: yes
 classoption: "hyperref,"
 
-
-
-
 ---
 
 ```{r setup, include=FALSE}
@@ -137,7 +134,7 @@ plot(linear.model.2)
 
 均方根误差（root-mean-square deviation、root-mean-square error、RMSD、RMSE）是一种常用的测量数值之间差异的度量[[4]](https://en.wikipedia.org/wiki/Root-mean-square_deviation)，可以通过计算准确值与预测值的RMSE来判断预测的好坏。
 
-另一方面，对于房价较高的观察值，其预测值可能会有较大的误差；而对于房价较低的观察值的预测值的误差也可能较低。为了消除其影响，实际上进行评价的指标是房价准确值与预测值的对数值的RMSE。
+另一方面，对于房价较高的观察值，其预测值可能会有较大的误差；而对于房价较低的观察值的预测值的误差也可能较低。为了消除其影响，实际上进行评价的指标是房价准确值与预测值的对数值的RMSE，该指标越低说明预测模型越优秀。
 
 为便于调用，程序将此评价指标实现为了一个函数。
 
@@ -165,6 +162,31 @@ evaluate(p2)
 
 kitchen sink模型最终指标较低，为0.1928299，这与上文中较低的修正后$R^2$值是相符的，因此考虑使用该模型预测测试集样本。
 
-在使用该模型预测测试集时，有部分数据显示为NA，这与部分观察值某项指标的缺失有关。考虑使用训练集的均值取代NA作为最终提交结果，在比赛网站上得到最终评价指标为0.38025[[5]](https://www.kaggle.com/c/house-prices-advanced-regression-techniques/leaderboard#score)，虽高于训练集的指标，但仍是一个可以接受的结果。
+```{r, warning=FALSE, include=FALSE}
+submission <- data.frame(Id = test$Id,
+                         SalePrice = predict(linear.model.1, test))
+write.csv(submission, file = "original_sub.csv")
+```
+
+在使用该模型预测测试集时，有部分数据显示为NA（附件1：original_sub.csv），这与部分观察值某项指标的缺失有关。考虑使用训练集的均值取代NA作为最终提交结果（附件2：adjusted_sub.csv），在比赛网站上得到最终评价指标为0.38025，该数值虽高于训练集的指标，但由于训练集的准确性一般高于测试集，因此这仍是一个可以接受的结果。
+
+```{r, include=FALSE}
+mean(train_values$SalePrice)
+```
 
 ## 改进思路
+
+至本文完成前，该模型总排名为4551名，并不是一个特别理想的结果。考虑改进思路如下：
+
+1. 引入对非数值变量的分析：本文在数据处理过程中直接去除全部非数值变量，而实际上非数值变量蕴含着非常重要的信息，若合理分析其含义可取得一定改进；
+2. 引入更加先进的模型：目前本文使用模型为线性回归模型，较为基础；而先进的模型如random forest模型、gradient boosting模型等会取得较好的效果。
+
+# 参考文献
+
+[1] Kaggle, House Prices: Advanced Regression Techniques[EB/OL], https://www.kaggle.com/c/house-prices-advanced-regression-techniques
+
+[2] 维基百科, 线性回归[EB/OL], https://zh.wikipedia.org/wiki/%E7%B7%9A%E6%80%A7%E5%9B%9E%E6%AD%B8
+
+[3] Tony Fischetti, Data Analysis with R, 2015.12
+
+[4] Wikipedia, Root-mean-square deviation[EB/OL], https://en.wikipedia.org/wiki/Root-mean-square_deviation

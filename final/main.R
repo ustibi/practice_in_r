@@ -123,6 +123,10 @@ submission2 <- test %>%
 train <- train %>% 
   mutate(predict = train$OverallQual*coef[2] + train$GrLivArea*coef[3])
 
+submission <- data.frame(Id = test$Id,
+                         SalePrice = predict(linear.model.1, test))
+write.csv(submission, file = "original_sub.csv")
+
 evaluate <- function(x, y) {
   mse <- sum((x-y)^2)/length(x)
   cor <- cor(x, y)
